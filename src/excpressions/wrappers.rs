@@ -2,6 +2,8 @@ use std::collections::HashMap;
 
 use crate::lexer::token;
 
+use super::expressions::Stantement;
+
 #[derive(Debug)]
 pub struct SwarmDescriptor {
     pub name:String,
@@ -14,7 +16,8 @@ pub struct SwarmDescriptor {
 #[derive(Debug)]
 pub struct AsyncCorutineDescriptor{
     pub name:String,
-    pub instructions: Vec<token::Token>,
+    pub tokens: Vec<token::Token>,
+    pub instructions:Vec<Stantement>,
 }
 
 impl SwarmDescriptor {

@@ -11,7 +11,9 @@ fn main() {
     match res {
         Ok(mut swarm)=> {
             swarm.parse_functions().unwrap();
-            println!("Program processed correctly {:?}",swarm)
+            //swarm.corutines.get("main").unwrap().create_expressions();
+            println!("Program processed correctly {:?}",swarm.corutines.get("main").unwrap());
+            
         },
         Err(e) => println!("Error parsing expressions: {}",e)
     }

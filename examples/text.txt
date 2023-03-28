@@ -3,13 +3,13 @@ swarm main (a,b) <in,out,err> [
     datapipe
 ] {
     async main {
-        let a = 1;
+        b = 2;
     }
     async ale {
-        let b = 2;
+        b = 2+2;
     }
     async tonno {
-        let b = 2;
+        b = 2;
         if (b == 3) {
             a = 3;
         }

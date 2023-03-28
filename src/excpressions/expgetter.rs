@@ -1,6 +1,6 @@
 use crate::{lexer::{Lexer, token}, excpressions::wrappers::SwarmDescriptor};
 
-use super::wrappers::AsyncCorutineDescriptor;
+use super::{wrappers::AsyncCorutineDescriptor, expressions::Stantement,expressions::Expression};
 
 pub fn find<'a, T: PartialEq> (v:&'a Vec<T>,el:T,err_str:&'static str) -> Result<usize,&'static str> {
     let res = v.iter().position(|e| *e == el);
@@ -106,9 +106,55 @@ impl SwarmDescriptor {
             let corutine_name = get_ident_name(&instructions[curutine_index + 1])?;
             let intructions_start  = find(&instructions,token::Token::LBRACE,"Nobrace for functrion start")?;
             end_brace_index = find_brace_end(&instructions)?;
-            self.corutines.insert(corutine_name.clone(), AsyncCorutineDescriptor{name:corutine_name,instructions:self.instructions[intructions_start+1..end_brace_index].to_vec()});
+            self.corutines.insert(corutine_name.clone(), AsyncCorutineDescriptor{name:corutine_name,tokens:self.instructions[intructions_start+1..end_brace_index].to_vec(),instructions:Vec::new()});
             end_brace_index+=1;
         }
+        //let keys:Vec<&String> = self.corutines.keys().collect();
+        for (k,v) in self.corutines.iter_mut(){
+            v.create_expressions();
+            v.tokens.clear();
+        }
+        Ok(())
+    }
+}
+
+
+impl AsyncCorutineDescriptor {
+    pub fn get_expressions_instructions (&self) -> Vec<Vec<&token::Token>> {
+        let mut expressions = Vec::new();
+        let mut expression = Vec::new();
+        for t in &self.tokens{
+            if *t != token::Token::SEMICOLON {
+                expression.push(t);
+            }else{
+                expressions.push(expression);
+                expression = Vec::new();
+            }
+        }
+        return expressions; 
+    }
+}
+
+impl AsyncCorutineDescriptor {
+    pub fn create_expressions (&mut self) -> Result<(),String> {
+        let mut final_expression = Vec::new();
+        let instructions = self.get_expressions_instructions();
+        for instruction in instructions{
+            let mut stantement = None;
+            if instruction.contains(&&token::Token::ASSIGN) {
+                let equals = find(&instruction, &&token::Token::ASSIGN, "Impossible to finr = in assign expression")?;
+                if equals != 1 {
+                    return Err(format!("too many things on the left of the =, found at index: {}",equals));
+                }
+                let singleinst = instruction[2].clone();
+                stantement = Some(Stantement::ASSIGN(get_ident_name(instruction[0])?, Expression::TOKENEXPRESSION(singleinst)));
+                
+            }
+            if let Some(exp) = stantement {
+                final_expression.push(exp);
+            }
+        }
+        self.instructions = final_expression;
         Ok(())
     }
 }
