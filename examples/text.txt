@@ -2,5 +2,5 @@ swarm main (a,b) <in,out,err> [
     filepipe,
     datapipe
 ] {
-    fn main {}      
+    async main {}      
 }

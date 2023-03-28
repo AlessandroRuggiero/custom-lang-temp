@@ -33,7 +33,8 @@ pub enum Token {
     PUT,
     GET,
     SWARM,
-    LOOP
+    LOOP,
+    ASYNC
 }
 
 pub fn get_keyword_token(ident: &Vec<char>) -> Result<Token, String> {
@@ -48,6 +49,7 @@ pub fn get_keyword_token(ident: &Vec<char>) -> Result<Token, String> {
         "return" => Ok(Token::RETURN),
         "swarm" => Ok(Token::SWARM),
         "loop" => Ok(Token::LOOP),
+        "async" => Ok(Token::ASYNC),
         _ => Err(String::from("Not a keyword"))
     }
 }

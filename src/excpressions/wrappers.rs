@@ -11,7 +11,12 @@ pub struct SwarmDescriptor {
 
 impl SwarmDescriptor {
     pub fn new (name:String,parameters:Vec<String>,pipes:Vec<String>,internal_pipes:Vec<String>,instructions: Vec<token::Token>) -> Self {
-        let swarm = SwarmDescriptor {name,parameters,io_pipes:pipes,internal_pipes,instructions};
+        let mut instruction_slicer = (0,instructions.len());
+        if instructions[0] == token::Token::LBRACE && instructions[instructions.len() -1 ] == token::Token::RBRACE{
+            instruction_slicer = (1,instructions.len() -1 );
+        } 
+        let to_save = instructions[instruction_slicer.0..instruction_slicer.1].to_vec();
+        let swarm = SwarmDescriptor {name,parameters,io_pipes:pipes,internal_pipes,instructions:to_save};
         return swarm;
     }
 }
