@@ -20,7 +20,7 @@ pub fn parse_swarm (l:&mut Lexer) -> Result<(),&str>{
     let tokens:Vec<_>= l.into_iter().collect();
     let swarm_index  = find(&tokens,token::Token::SWARM,"No swarm start")?;
     let args_index  = find(&tokens,token::Token::LPAREN,"No args start")?;
-    let args_end_index  = find(&tokens,token::Token::RPAREN,"No args start")?;
+    let args_end_index  = find(&tokens,token::Token::RPAREN,"No args end")?;
     if args_index - swarm_index != 2 || args_end_index == args_index{
         return Err("Malformed swarm");
     }
