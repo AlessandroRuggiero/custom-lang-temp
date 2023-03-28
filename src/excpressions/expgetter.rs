@@ -1,6 +1,8 @@
 use crate::{lexer::{Lexer, token}, excpressions::wrappers::SwarmDescriptor};
 
-fn find<'a, T: PartialEq> (v:&'a Vec<T>,el:T,err_str:&'static str) -> Result<usize,&'static str> {
+use super::wrappers::AsyncCorutineDescriptor;
+
+pub fn find<'a, T: PartialEq> (v:&'a Vec<T>,el:T,err_str:&'static str) -> Result<usize,&'static str> {
     let res = v.iter().position(|e| *e == el);
     match res {
         None => Err(err_str),
@@ -45,6 +47,23 @@ fn check_balanced_brakets (v:&[token::Token]) -> bool {
 }
 
 
+fn find_brace_end (instructions:&Vec<token::Token>) -> Result<usize, &'static str>{
+        let mut open = 0;
+        for (i,t) in instructions.iter().enumerate(){
+            match t {
+                token::Token::LBRACE => open+=1,
+                token::Token::RBRACE => {
+                    open-=1;
+                    if open == 0 {
+                        return Ok(i);
+                    }
+                },
+                _ => {}
+            }
+        }
+        Err("No end brace found")
+}
+
 pub fn parse_swarm (l:&mut Lexer) -> Result<SwarmDescriptor,&str>{
     l.read_char();
     let tokens:Vec<_>= l.into_iter().collect();
@@ -71,7 +90,25 @@ pub fn parse_swarm (l:&mut Lexer) -> Result<SwarmDescriptor,&str>{
         return Err("Body brackets are not balanced")
     }
     let swarm = SwarmDescriptor::new(swarm_name,parameters,pipes,internal_pipes,body.to_vec());
-    println!("{:?}",swarm);
+    //println!("{:?}",swarm);
     
     return Ok(swarm);
+}
+
+impl SwarmDescriptor {
+    pub fn parse_functions (& mut self) -> Result<(), &str>{
+        let mut end_brace_index = 0;
+        let mut instructions = self.instructions.clone();
+        while end_brace_index != instructions.len() {
+            instructions = instructions[end_brace_index..].to_vec();
+            //println!("{:?}",instructions);
+            let curutine_index  = find(&instructions,token::Token::ASYNC,"No async function start")?;
+            let corutine_name = get_ident_name(&instructions[curutine_index + 1])?;
+            let intructions_start  = find(&instructions,token::Token::LBRACE,"Nobrace for functrion start")?;
+            end_brace_index = find_brace_end(&instructions)?;
+            self.corutines.insert(corutine_name.clone(), AsyncCorutineDescriptor{name:corutine_name,instructions:self.instructions[intructions_start+1..end_brace_index].to_vec()});
+            end_brace_index+=1;
+        }
+        Ok(())
+    }
 }

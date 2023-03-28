@@ -2,5 +2,16 @@ swarm main (a,b) <in,out,err> [
     filepipe,
     datapipe
 ] {
-    async main {}      
+    async main {
+        let a = 1;
+    }
+    async ale {
+        let b = 2;
+    }
+    async tonno {
+        let b = 2;
+        if (b == 3) {
+            a = 3;
+        }
+    }
 }

@@ -9,7 +9,8 @@ fn main() {
     let mut l = lexer::Lexer::new(input.chars().collect());
     let res = excpressions::expgetter::parse_swarm(&mut l);
     match res {
-        Ok(swarm)=> {
+        Ok(mut swarm)=> {
+            swarm.parse_functions().unwrap();
             println!("Program processed correctly {:?}",swarm)
         },
         Err(e) => println!("Error parsing expressions: {}",e)

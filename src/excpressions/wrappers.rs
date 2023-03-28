@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::lexer::token;
 
 #[derive(Debug)]
@@ -6,7 +8,13 @@ pub struct SwarmDescriptor {
     pub parameters: Vec<String>,
     pub io_pipes:Vec<String>,
     pub internal_pipes:Vec<String>,
-    pub instructions: Vec<token::Token>
+    pub instructions: Vec<token::Token>,
+    pub corutines: HashMap<String,AsyncCorutineDescriptor>
+}
+#[derive(Debug)]
+pub struct AsyncCorutineDescriptor{
+    pub name:String,
+    pub instructions: Vec<token::Token>,
 }
 
 impl SwarmDescriptor {
@@ -16,7 +24,7 @@ impl SwarmDescriptor {
             instruction_slicer = (1,instructions.len() -1 );
         } 
         let to_save = instructions[instruction_slicer.0..instruction_slicer.1].to_vec();
-        let swarm = SwarmDescriptor {name,parameters,io_pipes:pipes,internal_pipes,instructions:to_save};
+        let swarm = SwarmDescriptor {name,parameters,io_pipes:pipes,internal_pipes,instructions:to_save,corutines:HashMap::new()};
         return swarm;
     }
 }
