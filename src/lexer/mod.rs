@@ -77,62 +77,62 @@ impl Lexer {
         while self.skip_whitespace() {}
         match self.ch {
             '=' => {
-                tok = token::Token::ASSIGN(self.ch);
+                tok = token::Token::ASSIGN;
             },
             '+' => {
-                tok = token::Token::PLUS(self.ch);
+                tok = token::Token::PLUS;
             },
             '-' => {
                 if self.peek_char() == '>' { // we have a <-
                     tok = token::Token::GET;
                     self.skip_char();
                 }else {
-                    tok = token::Token::MINUS(self.ch);
+                    tok = token::Token::MINUS;
                 }
             },
             '!' => {
-                tok = token::Token::BANG(self.ch);
+                tok = token::Token::BANG;
             },
             '/' => {
-                tok = token::Token::SLASH(self.ch);
+                tok = token::Token::SLASH;
             },
             '*' => {
-                tok = token::Token::ASTERISK(self.ch);
+                tok = token::Token::ASTERISK;
             },
             '<' => {
                 if self.peek_char() == '-' { // we have a <-
                     tok = token::Token::PUT;
                     self.skip_char();
                 }else {
-                    tok = token::Token::LT(self.ch);
+                    tok = token::Token::LT;
                 }
             },
             '>' => {
-                tok = token::Token::GT(self.ch);
+                tok = token::Token::GT;
             },
             ';' => {
-                tok = token::Token::SEMICOLON(self.ch);
+                tok = token::Token::SEMICOLON;
             },
             '(' => {
-                tok = token::Token::LPAREN(self.ch);
+                tok = token::Token::LPAREN;
             },
             ')' => {
-                tok = token::Token::RPAREN(self.ch);
+                tok = token::Token::RPAREN;
             },
             ',' => {
-                tok = token::Token::COMMA(self.ch);
+                tok = token::Token::COMMA;
             },
             '{' => {
-                tok = token::Token::LBRACE(self.ch);
+                tok = token::Token::LBRACE;
             },
             '}' => {
-                tok = token::Token::RBRACE(self.ch);
+                tok = token::Token::RBRACE;
             },
             '[' => {
-                tok = token::Token::LBRAKET(self.ch);
+                tok = token::Token::LBRAKET;
             },
             ']' => {
-                tok = token::Token::RBRAKET(self.ch);
+                tok = token::Token::RBRAKET;
             },
             '0' => {
                 tok = token::Token::EOF;
@@ -160,5 +160,17 @@ impl Lexer {
         }
         self.read_char();
         tok
+    }
+}
+
+impl Iterator for Lexer {
+    type Item = token::Token;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let token = self.next_token();
+        if token == token::Token::EOF {
+            return None;
+        } 
+        return Some(token);
     }
 }

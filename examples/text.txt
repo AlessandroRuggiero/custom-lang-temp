@@ -1,4 +1,4 @@
-swarm main (args) <in,out,err> [
+swarm main (a,b) <in,out,err> [
     filepipe,
     datapipe
 ] {
