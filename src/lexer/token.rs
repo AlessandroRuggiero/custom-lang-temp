@@ -34,7 +34,8 @@ pub enum Token {
     GET,
     SWARM,
     LOOP,
-    ASYNC
+    ASYNC,
+    DOUBLEQUOTES
 }
 
 pub fn get_keyword_token(ident: &Vec<char>) -> Result<Token, String> {

@@ -3,15 +3,6 @@ swarm main (a,b) <in,out,err> [
     datapipe
 ] {
     async main {
-        b = 2;
-    }
-    async ale {
-        b = 2+2;
-    }
-    async tonno {
-        b = 2;
-        if (b == 3) {
-            a = 3;
-        }
+        out <- "ciao";
     }
 }

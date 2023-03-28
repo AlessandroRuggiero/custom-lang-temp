@@ -8,7 +8,7 @@ pub struct Lexer {
 }
 
 fn is_letter(ch: char) -> bool {
-    'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
+    'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_' || ch == '/'
 }
 
 fn is_digit(ch: char) -> bool {
@@ -136,6 +136,9 @@ impl Lexer {
             },
             '0' => {
                 tok = token::Token::EOF;
+            },
+            '\"' => {
+                tok = token::Token::DOUBLEQUOTES;
             }
             _ => {
                 if is_letter(self.ch) {

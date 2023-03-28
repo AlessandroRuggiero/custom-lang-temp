@@ -10,7 +10,7 @@ pub fn find<'a, T: PartialEq> (v:&'a Vec<T>,el:T,err_str:&'static str) -> Result
     }
 }
 
-fn get_ident_name (i: &token::Token) -> Result<String,&'static str> {
+pub fn get_ident_name (i: &token::Token) -> Result<String,&'static str> {
     match i{
         token::Token::IDENT(v) => Ok(v.into_iter().collect()),
         _ => Err("swarm entity name is invalid")
@@ -96,7 +96,7 @@ pub fn parse_swarm (l:&mut Lexer) -> Result<SwarmDescriptor,&str>{
 }
 
 impl SwarmDescriptor {
-    pub fn parse_functions (& mut self) -> Result<(), &str>{
+    pub fn parse_functions (& mut self) -> Result<(), String>{
         let mut end_brace_index = 0;
         let mut instructions = self.instructions.clone();
         while end_brace_index != instructions.len() {
@@ -110,8 +110,8 @@ impl SwarmDescriptor {
             end_brace_index+=1;
         }
         //let keys:Vec<&String> = self.corutines.keys().collect();
-        for (k,v) in self.corutines.iter_mut(){
-            v.create_expressions();
+        for (_,v) in self.corutines.iter_mut(){
+            v.create_expressions()?;
             v.tokens.clear();
         }
         Ok(())
@@ -139,16 +139,24 @@ impl AsyncCorutineDescriptor {
     pub fn create_expressions (&mut self) -> Result<(),String> {
         let mut final_expression = Vec::new();
         let instructions = self.get_expressions_instructions();
+        //println!("{:?}",instructions);
         for instruction in instructions{
             let mut stantement = None;
             if instruction.contains(&&token::Token::ASSIGN) {
-                let equals = find(&instruction, &&token::Token::ASSIGN, "Impossible to finr = in assign expression")?;
+                let equals = find(&instruction, &&token::Token::ASSIGN, "Impossible to find = in assign expression")?;
                 if equals != 1 {
                     return Err(format!("too many things on the left of the =, found at index: {}",equals));
                 }
                 let singleinst = instruction[2].clone();
-                stantement = Some(Stantement::ASSIGN(get_ident_name(instruction[0])?, Expression::TOKENEXPRESSION(singleinst)));
+                stantement = Some(Stantement::ASSIGN(get_ident_name(instruction[0])?, Expression::new(instruction[2..].to_vec())));
                 
+            } else if instruction.contains(&&token::Token::PUT) {
+                let equals = find(&instruction, &&token::Token::PUT, "Impossible to find <- in expression")?;
+                if equals != 1 {
+                    return Err(format!("too many things on the left of the <-, found at index: {}",equals));
+                }
+                let singleinst = instruction[2].clone();
+                stantement = Some(Stantement::PUT(get_ident_name(instruction[0])?, Expression::new(instruction[2..].to_vec())));
             }
             if let Some(exp) = stantement {
                 final_expression.push(exp);

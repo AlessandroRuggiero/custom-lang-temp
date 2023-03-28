@@ -1,5 +1,7 @@
 use std::fs;
 
+use crate::excpressions::wrappers::Swarm;
+
 mod lexer;
 mod excpressions;
 
@@ -11,9 +13,9 @@ fn main() {
     match res {
         Ok(mut swarm)=> {
             swarm.parse_functions().unwrap();
-            //swarm.corutines.get("main").unwrap().create_expressions();
-            println!("Program processed correctly {:?}",swarm.corutines.get("main").unwrap());
-            
+            //println!("Program processed correctly {:?}",swarm.corutines.get("main").unwrap());
+            let mut swarm = Swarm::new(swarm);
+            swarm.execute_corutines();
         },
         Err(e) => println!("Error parsing expressions: {}",e)
     }
