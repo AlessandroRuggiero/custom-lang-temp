@@ -25,6 +25,18 @@ impl Lexer {
         }
     }
 
+    pub fn peek_char (&self) -> char{
+        if self.read_position >= self.input.len() {
+            '0'
+        } else {
+            self.input[self.read_position]
+        }
+    }
+    pub fn skip_char (& mut self) {
+        self.position = self.read_position;
+        self.read_position = self.read_position + 1;
+    }
+    
     pub fn read_char(&mut self) {
         if self.read_position >= self.input.len() {
             self.ch = '0';
@@ -35,11 +47,13 @@ impl Lexer {
         self.read_position = self.read_position + 1;
     }
 
-    pub fn skip_whitespace(&mut self) {
+    pub fn skip_whitespace(&mut self) -> bool {
         let ch = self.ch;
         if ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' {
             self.read_char();
+            return true;
         }
+        return false;
     }
 
     pub fn next_token(&mut self) -> token::Token {
@@ -60,7 +74,7 @@ impl Lexer {
         };
 
         let tok: token::Token;
-        self.skip_whitespace();
+        while self.skip_whitespace() {}
         match self.ch {
             '=' => {
                 tok = token::Token::ASSIGN(self.ch);
@@ -69,7 +83,12 @@ impl Lexer {
                 tok = token::Token::PLUS(self.ch);
             },
             '-' => {
-                tok = token::Token::MINUS(self.ch);
+                if self.peek_char() == '>' { // we have a <-
+                    tok = token::Token::GET;
+                    self.skip_char();
+                }else {
+                    tok = token::Token::MINUS(self.ch);
+                }
             },
             '!' => {
                 tok = token::Token::BANG(self.ch);
@@ -81,7 +100,12 @@ impl Lexer {
                 tok = token::Token::ASTERISK(self.ch);
             },
             '<' => {
-                tok = token::Token::LT(self.ch);
+                if self.peek_char() == '-' { // we have a <-
+                    tok = token::Token::PUT;
+                    self.skip_char();
+                }else {
+                    tok = token::Token::LT(self.ch);
+                }
             },
             '>' => {
                 tok = token::Token::GT(self.ch);
@@ -104,6 +128,12 @@ impl Lexer {
             '}' => {
                 tok = token::Token::RBRACE(self.ch);
             },
+            '[' => {
+                tok = token::Token::LBRAKET(self.ch);
+            },
+            ']' => {
+                tok = token::Token::RBRAKET(self.ch);
+            },
             '0' => {
                 tok = token::Token::EOF;
             }
@@ -123,6 +153,7 @@ impl Lexer {
                     return token::Token::INT(ident);
                 } 
                 else {
+                    println!("{}",self.ch == ' ');
                     return token::Token::ILLEGAL
                 }
             }

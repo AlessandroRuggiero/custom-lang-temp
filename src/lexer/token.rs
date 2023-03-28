@@ -15,6 +15,8 @@ pub enum Token {
     RPAREN(char),
     LBRACE(char),
     RBRACE(char),
+    LBRAKET(char),
+    RBRAKET(char),
     FUNCTION,
     LET,
     TRUE,
@@ -27,7 +29,11 @@ pub enum Token {
     ASTERISK(char),
     SLASH(char),
     LT(char),
-    GT(char)
+    GT(char),
+    PUT,
+    GET,
+    SWARM,
+    LOOP
 }
 
 pub fn get_keyword_token(ident: &Vec<char>) -> Result<Token, String> {
@@ -40,6 +46,8 @@ pub fn get_keyword_token(ident: &Vec<char>) -> Result<Token, String> {
         "if" => Ok(Token::IF),
         "else" => Ok(Token::ELSE),
         "return" => Ok(Token::RETURN),
+        "swarm" => Ok(Token::SWARM),
+        "loop" => Ok(Token::LOOP),
         _ => Err(String::from("Not a keyword"))
     }
 }

@@ -1,0 +1,7 @@
+swarm main (args) <in,out,err> [
+    filepipe,
+    datapipe
+] {
+    fn main {
+        
+}
