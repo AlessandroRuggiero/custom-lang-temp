@@ -1,4 +1,4 @@
-use std::{collections::HashMap, ops::Add};
+use std::{collections::HashMap, ops::{Add, Sub}};
 use crate::lexer::token;
 use crossbeam_channel::{bounded, Sender,Receiver};
 use super::expressions::{Stantement, Variable};
@@ -118,6 +118,23 @@ impl Add for Variable {
             (Variable::FLOAT(_), Variable::STRING(_)) => todo!(),
             (Variable::FLOAT(n1), Variable::INT(n2)) => Ok (Variable::FLOAT(n1+(n2 as f64))),
             (Variable::FLOAT(n1), Variable::FLOAT(n2)) => Ok (Variable::FLOAT(n1+n2))
+        }
+    }
+}
+
+impl Sub for Variable {
+    type Output = Result<Variable,String>;
+    fn sub(self, rhs: Self) -> Self::Output {
+        match (self,rhs) {
+            (Variable::STRING(_), Variable::STRING(_)) => todo!(),
+            (Variable::STRING(_), Variable::INT(_)) => todo!(),
+            (Variable::STRING(_), Variable::FLOAT(_)) => todo!(),
+            (Variable::INT(_), Variable::STRING(_)) => todo!(),
+            (Variable::INT(n1), Variable::INT(n2)) => Ok (Variable::INT(n1-n2)),
+            (Variable::INT(n1), Variable::FLOAT(n2)) => Ok (Variable::FLOAT((n1 as f64) - n2)),
+            (Variable::FLOAT(_), Variable::STRING(_)) => todo!(),
+            (Variable::FLOAT(n1), Variable::INT(n2)) => Ok (Variable::FLOAT(n1 - (n2 as f64))),
+            (Variable::FLOAT(n1), Variable::FLOAT(n2)) => Ok (Variable::FLOAT(n1-n2)),
         }
     }
 }

@@ -39,15 +39,29 @@ impl Expression {
                 t => Err(format!("Invalid literal: {:?}",t))
             };
         
-        } else if self.instruction.contains(&token::Token::PLUS)  {
-            let splitter = self.instruction.iter().position(|e| e == &token::Token::PLUS).unwrap();
+        } else if self.instruction.contains(&token::Token::PLUS) || self.instruction.contains(&token::Token::MINUS)  {
+            let mut operation = &token::Token::PLUS;
+            if  self.instruction.contains(&token::Token::MINUS){
+                operation = &token::Token::MINUS;
+            }
+            let mut splitter:Option<usize> = None;
+            for (i,inst) in self.instruction.iter().enumerate() {
+                if inst == operation {
+                    splitter = Some(i);
+                }
+            }
+            let splitter = splitter.expect("Cant find operationindex");
             let left:Vec<&token::Token> = self.instruction[0..splitter].iter().map(|e| e ).collect(); 
             let left = Expression::new(left);
             let rigth:Vec<&token::Token> = self.instruction[splitter+1..].iter().map(|e| e ).collect(); 
             let rigth = Expression::new(rigth);
             let vl = left.evaluate(f)?;
             let vr = rigth.evaluate(f)?;
-            return vl + vr;
+            return match operation {
+                token::Token::PLUS => vl + vr,
+                token::Token::MINUS => vl - vr,
+                _ => Err("Invalid operation".to_owned())
+            }; 
             // let rigth = Expression::new();
         }else if self.instruction.len() == 3 {
             //parsing a float

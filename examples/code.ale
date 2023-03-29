@@ -1,13 +1,15 @@
 swarm main () <in,out> [datapipe] {
     async ale {
-        a = 1 + 1.2;
-        a = 1 + a;
-        out <- a;
+        b = "gaia";
+        c = "gnomo";
+        d = b + " " + c;
+        a = 1.2 - 1 - 1;
+        datapipe <- a;
+        out <- d;
     }
 
     async gg {
-        in -> a;
-        a = a + " " + a;
-        out <- a;
+        datapipe -> data;
+        out <- data;
     }
 }
