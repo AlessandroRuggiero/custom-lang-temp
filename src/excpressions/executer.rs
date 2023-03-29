@@ -5,7 +5,7 @@ use super::{wrappers::{Swarm, AsyncCorutine, Pipe, Message}, expressions::{Stant
 
 impl Swarm {
     fn swarm_setup (&mut self) -> Vec<JoinHandle<()>>{
-        // std in 
+        // std out 
         let (i,o) = bounded::<Message>(0);
         let std_out = Pipe::new(Some(i),None);
         self.pipes.insert(self.swarm.io_pipes[1].clone(), std_out);
@@ -21,6 +21,8 @@ impl Swarm {
                 };
             }
         });
+
+        //std in
         let (i,o) = bounded::<Message>(0);
         let std_in = Pipe::new(None,Some(o));
         self.pipes.insert(self.swarm.io_pipes[0].clone(), std_in);
@@ -29,6 +31,7 @@ impl Swarm {
                 let stdin = io::stdin();
                 let mut user_input = String::new();
                 let res = stdin.read_line(&mut user_input);
+                user_input = user_input[..(user_input.len()-1)].to_string();  // removing new line
                 match res {
                     Ok(_) => {
                         let r = i.send(Message::MSG(Variable::STRING(user_input)));
@@ -41,6 +44,13 @@ impl Swarm {
                 }
             }
         });
+
+        // setup internal pipes
+        for p in &self.swarm.internal_pipes {
+            let (i,o) = bounded::<Message>(0);
+            let pipe = Pipe::new(Some(i),Some(o));
+            self.pipes.insert(p.clone(), pipe);
+        }
         return vec![handle];
     }
     pub fn execute_corutines (&mut self) {
@@ -77,7 +87,8 @@ impl AsyncCorutine {
             match instruction {
                 Stantement::PUT(c, v) => {
                     let var = v.exaluate(&self).expect("expression evaluation failed");
-                    let pipe = pipes.get(c).unwrap();
+                    //println!("{:?}",pipes);
+                    let pipe = pipes.get(c).expect("Impossible to find pipe where to put the data");
                     pipe.send(Message::MSG(var)).expect("Cant send message varible in pipe");
                 },
                 Stantement::GET(c,v ) => {
