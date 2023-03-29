@@ -6,7 +6,7 @@ mod lexer;
 mod excpressions;
 
 fn main() {
-    let contents = fs::read_to_string("examples/text.txt").expect("Should have been able to read the file");
+    let contents = fs::read_to_string("examples/code.ale").expect("Should have been able to read the file");
     let input = String::from(contents);
     let mut l = lexer::Lexer::new(input.chars().collect());
     let res = excpressions::expgetter::parse_swarm(&mut l);
