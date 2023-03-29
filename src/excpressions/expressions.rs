@@ -33,7 +33,7 @@ pub enum Variable {
 impl ToString for Variable {
     fn to_string(&self) -> String {
         match self {
-            Variable::STRING(v) =>v.clone(),
+            Variable::STRING(v) => v.clone(),
             Variable::INT(i) => i.to_string(),
             Variable::FLOAT(f) => f.to_string(),
         }
