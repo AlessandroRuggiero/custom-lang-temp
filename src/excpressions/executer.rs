@@ -86,7 +86,7 @@ impl AsyncCorutine {
             let instruction = &self.corutine.instructions[self.i_counter];
             match instruction {
                 Stantement::PUT(c, v) => {
-                    let var = v.exaluate(&self).expect("expression evaluation failed");
+                    let var = v.evaluate(&self).expect("expression evaluation failed");
                     //println!("{:?}",pipes);
                     let pipe = pipes.get(c).expect("Impossible to find pipe where to put the data");
                     pipe.send(Message::MSG(var)).expect("Cant send message varible in pipe");

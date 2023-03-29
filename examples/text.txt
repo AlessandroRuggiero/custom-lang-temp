@@ -2,7 +2,7 @@ swarm main () <in,out> [datapipe] {
     async ale {
         in -> a;
         out <- "mainstarted";
-        datapipe <- a;
+        datapipe <- 22.2;
     }
     async al {
        datapipe -> b;

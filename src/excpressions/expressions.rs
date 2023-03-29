@@ -26,12 +26,16 @@ impl Expression {
 #[derive(Debug,Clone)]
 pub enum Variable {
     STRING(String),
+    INT(i64),
+    FLOAT(f64)
 }
 
 impl ToString for Variable {
     fn to_string(&self) -> String {
         match self {
             Variable::STRING(v) =>v.clone(),
+            Variable::INT(i) => i.to_string(),
+            Variable::FLOAT(f) => f.to_string(),
         }
     }
 }

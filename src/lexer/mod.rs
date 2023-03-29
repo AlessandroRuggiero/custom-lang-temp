@@ -140,6 +140,9 @@ impl Lexer {
             '\"' => {
                 tok = token::Token::DOUBLEQUOTES;
             }
+            '.' => {
+                tok = token::Token::DOT
+            },
             _ => {
                 if is_letter(self.ch) {
                     let ident: Vec<char> = read_identifier(self);
