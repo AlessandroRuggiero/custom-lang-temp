@@ -126,7 +126,13 @@ impl Sub for Variable {
     type Output = Result<Variable,String>;
     fn sub(self, rhs: Self) -> Self::Output {
         match (self,rhs) {
-            (Variable::STRING(_), Variable::STRING(_)) => todo!(),
+            (Variable::STRING(s1), Variable::STRING(s2)) => {
+                if !s1.contains(&s2){
+                    return Ok(Variable::STRING(s1));
+                }
+                let s3 = s1.replace(&s2, "");
+                Ok (Variable::STRING(s3))
+            },
             (Variable::STRING(_), Variable::INT(_)) => todo!(),
             (Variable::STRING(_), Variable::FLOAT(_)) => todo!(),
             (Variable::INT(_), Variable::STRING(_)) => todo!(),
