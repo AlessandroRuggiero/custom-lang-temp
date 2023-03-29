@@ -4,7 +4,8 @@ pub struct Lexer {
     input: Vec<char>,
     pub position: usize,
     pub read_position: usize,
-    pub ch: char
+    pub ch: char,
+    in_string:bool
 }
 
 fn is_letter(ch: char) -> bool {
@@ -21,7 +22,8 @@ impl Lexer {
             input: input,
             position: 0,
             read_position: 0,
-            ch: '0'
+            ch: '0',
+            in_string: false
         }
     }
 
@@ -49,7 +51,7 @@ impl Lexer {
 
     pub fn skip_whitespace(&mut self) -> bool {
         let ch = self.ch;
-        if ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' {
+        if  ch == '\t' || ch == '\n' || ch == '\r' {
             self.read_char();
             return true;
         }
@@ -139,9 +141,19 @@ impl Lexer {
             },
             '\"' => {
                 tok = token::Token::DOUBLEQUOTES;
+                self.in_string = !self.in_string;
+                //println!("flip {}",self.in_string);
             }
             '.' => {
                 tok = token::Token::DOT
+            },
+            ' ' => {
+                //println!("spaced {}",self.in_string);
+                if self.in_string {
+                    tok = token::Token::STRINGSPACE;
+                } else {
+                    tok = token::Token::IGNORE;
+                }
             },
             _ => {
                 if is_letter(self.ch) {
@@ -159,7 +171,7 @@ impl Lexer {
                     return token::Token::INT(ident);
                 } 
                 else {
-                    println!("{}",self.ch == ' ');
+                    println!("{:?}",self.ch);
                     return token::Token::ILLEGAL
                 }
             }

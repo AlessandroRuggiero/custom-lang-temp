@@ -66,7 +66,7 @@ fn find_brace_end (instructions:&Vec<token::Token>) -> Result<usize, &'static st
 
 pub fn parse_swarm (l:&mut Lexer) -> Result<SwarmDescriptor,&str>{
     l.read_char();
-    let tokens:Vec<_>= l.into_iter().collect();
+    let tokens:Vec<_>= l.into_iter().filter(|e| *e != token::Token::IGNORE).collect();
     let swarm_index  = find(&tokens,token::Token::SWARM,"No swarm start")?;
     let args_index  = find(&tokens,token::Token::LPAREN,"No args start")?;
     let args_end_index  = find(&tokens,token::Token::RPAREN,"No args end")?;

@@ -85,6 +85,10 @@ impl AsyncCorutine {
         while self.i_counter != self.corutine.instructions.len(){
             let instruction = &self.corutine.instructions[self.i_counter];
             match instruction {
+                Stantement::ASSIGN(var, exp) => {
+                    let v = exp.evaluate(self).expect("Error evaluating rigth of =");
+                    self.variables.insert(var.clone(), v);
+                },
                 Stantement::PUT(c, v) => {
                     let var = v.evaluate(&self).expect("expression evaluation failed");
                     //println!("{:?}",pipes);
