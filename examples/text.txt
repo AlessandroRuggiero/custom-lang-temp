@@ -4,5 +4,7 @@ swarm main (a,b) <in,out,err> [
 ] {
     async main {
         out <- "ciao";
+        out <- "gg";
+        out <- "test";
     }
 }

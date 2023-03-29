@@ -147,7 +147,6 @@ impl AsyncCorutineDescriptor {
                 if equals != 1 {
                     return Err(format!("too many things on the left of the =, found at index: {}",equals));
                 }
-                let singleinst = instruction[2].clone();
                 stantement = Some(Stantement::ASSIGN(get_ident_name(instruction[0])?, Expression::new(instruction[2..].to_vec())));
                 
             } else if instruction.contains(&&token::Token::PUT) {
@@ -155,7 +154,6 @@ impl AsyncCorutineDescriptor {
                 if equals != 1 {
                     return Err(format!("too many things on the left of the <-, found at index: {}",equals));
                 }
-                let singleinst = instruction[2].clone();
                 stantement = Some(Stantement::PUT(get_ident_name(instruction[0])?, Expression::new(instruction[2..].to_vec())));
             }
             if let Some(exp) = stantement {

@@ -1,7 +1,7 @@
-use std::collections::HashMap;
+use std::{collections::HashMap};
 use crate::lexer::token;
 use crossbeam_channel::{bounded, Sender,Receiver};
-use super::expressions::Stantement;
+use super::expressions::{Stantement, Variable};
 
 #[derive(Debug)]
 pub struct SwarmDescriptor {
@@ -57,15 +57,28 @@ impl AsyncCorutine {
 
 #[derive(Debug,Clone)]
 pub struct Pipe {
-    pub sender: Option<Sender<String>>,
-    pub receiver: Option<Receiver<String>>
+    pub sender: Option<Sender<Message>>,
+    pub receiver: Option<Receiver<Message>>
+}
+#[derive(Debug)]
+pub enum Message {
+    MSG (Variable),
+    CLOSE
 }
 
 impl Pipe {
-    pub fn new(sender: Option<Sender<String>>, receiver: Option<Receiver<String>>) -> Self { Self { sender, receiver } }
-    pub fn send (&self,s:String) -> Result<(),&str>{
+    pub fn new(sender: Option<Sender<Message>>, receiver: Option<Receiver<Message>>) -> Self { Self { sender, receiver } }
+    pub fn send (&self,s:Message) -> Result<(),&str>{
         match &self.sender {
-            Some (sender) => {sender.send(s).unwrap();Ok (())},
+            Some (sender) => {
+                let res = sender.send(s);
+                return match res {
+                    Ok(_) => Ok(()),
+                    Err(e) => {
+                        println!("Cant send data in channel: {}",e.to_string());
+                        Err("Impossible to send data in channel")
+                    },
+                };}
             None => Err("Impossible to send data in this pipe")
         }
     }
