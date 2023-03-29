@@ -1,13 +1,14 @@
-use std::{thread::{self, JoinHandle}, collections::HashMap};
+use std::{thread::{self, JoinHandle}, collections::HashMap, io};
 use crossbeam_channel::bounded;
 
-use super::{wrappers::{Swarm, AsyncCorutine, Pipe, Message}, expressions::{Stantement}};
+use super::{wrappers::{Swarm, AsyncCorutine, Pipe, Message}, expressions::{Stantement, Variable}};
 
 impl Swarm {
     fn swarm_setup (&mut self) -> Vec<JoinHandle<()>>{
+        // std in 
         let (i,o) = bounded::<Message>(0);
         let std_out = Pipe::new(Some(i),None);
-        self.pipes.insert("out".to_owned(), std_out);
+        self.pipes.insert(self.swarm.io_pipes[1].clone(), std_out);
         let handle = thread::spawn(move || {
             loop {
                 let data = o.recv().expect("Failed to recive");
@@ -19,7 +20,26 @@ impl Swarm {
                     },
                 };
             }
-            //println!("Channel closing");
+        });
+        let (i,o) = bounded::<Message>(0);
+        let std_in = Pipe::new(None,Some(o));
+        self.pipes.insert(self.swarm.io_pipes[0].clone(), std_in);
+        let _ = thread::spawn(move || {
+            loop {
+                let stdin = io::stdin();
+                let mut user_input = String::new();
+                let res = stdin.read_line(&mut user_input);
+                match res {
+                    Ok(_) => {
+                        let r = i.send(Message::MSG(Variable::STRING(user_input)));
+                        match r {
+                            Ok(_) => {},
+                            Err(e) => println!("Cant send data in srd in {:?}",e),
+                        }
+                    },
+                    Err(e) => println!("Cant read from standard in {:?}",e),
+                }
+            }
         });
         return vec![handle];
     }
@@ -32,6 +52,7 @@ impl Swarm {
             let cr = self.swarm.corutines.get(corutine).expect("invalid key got from map").clone();
             let mut cr = AsyncCorutine::new(cr);
             let pipes = self.pipes.clone();
+            println!("started: {}",cr.corutine.name);
             handles.push(thread::spawn(move || {
                 cr.execute(pipes);
             }));
@@ -39,7 +60,7 @@ impl Swarm {
         for c in handles{
             c.join().unwrap();
         }
-        self.pipes.get("out").expect("no std out").send(Message::CLOSE).expect("Cant close stdout");
+        self.pipes.get(&self.swarm.io_pipes[1]).expect("no std out").send(Message::CLOSE).expect("Cant close stdout");
         for t in io_handles{
             //println!("Waiting for io threads to close");
             t.join().unwrap();
@@ -50,13 +71,28 @@ impl Swarm {
 
 impl AsyncCorutine {
     pub fn execute (&mut self, pipes:HashMap<String,Pipe>) {
+        println!("Executing: {:?}",self.corutine.instructions.clone());
         while self.i_counter != self.corutine.instructions.len(){
             let instruction = &self.corutine.instructions[self.i_counter];
             match instruction {
                 Stantement::PUT(c, v) => {
-                    let var = v.exaluate().expect("expression evaluation failed");
+                    let var = v.exaluate(&self).expect("expression evaluation failed");
                     let pipe = pipes.get(c).unwrap();
                     pipe.send(Message::MSG(var)).expect("Cant send message varible in pipe");
+                },
+                Stantement::GET(c,v ) => {
+                    let pipe = pipes.get(c).expect("impossible to find pipe");
+                    let msg = pipe.receive();
+                    match msg {
+                        Ok(m) => {
+                            match m {
+                                Message::MSG(var) => {self.variables.insert(v.to_string(),var );
+                                },
+                                Message::CLOSE => break,
+                            }
+                        },
+                        Err(e) => panic!("Impossible to find pipe"),
+                    }
                 },
                 _ => panic!("invalid stantement")
             }

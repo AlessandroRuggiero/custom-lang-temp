@@ -1,10 +1,11 @@
-swarm main (a,b) <in,out,err> [
+swarm main (a,b) <in,o,err> [
     filepipe,
     datapipe
 ] {
     async main {
-        out <- "ciao";
-        out <- "gg";
-        out <- "test";
+        o <- "mainstarted";
+    }
+    async al {
+       o <- "alstared";
     }
 }

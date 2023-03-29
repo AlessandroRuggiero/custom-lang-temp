@@ -3,7 +3,8 @@ use crate::lexer::token;
 #[derive(Debug,Clone)]
 pub enum Stantement {
     ASSIGN(String,Expression),
-    PUT(String,Expression)
+    PUT(String,Expression),
+    GET(String,String),
 }
 
 

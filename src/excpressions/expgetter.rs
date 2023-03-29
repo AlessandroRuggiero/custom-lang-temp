@@ -106,7 +106,7 @@ impl SwarmDescriptor {
             let corutine_name = get_ident_name(&instructions[curutine_index + 1])?;
             let intructions_start  = find(&instructions,token::Token::LBRACE,"Nobrace for functrion start")?;
             end_brace_index = find_brace_end(&instructions)?;
-            self.corutines.insert(corutine_name.clone(), AsyncCorutineDescriptor{name:corutine_name,tokens:self.instructions[intructions_start+1..end_brace_index].to_vec(),instructions:Vec::new()});
+            self.corutines.insert(corutine_name.clone(), AsyncCorutineDescriptor{name:corutine_name,tokens:instructions[intructions_start+1..end_brace_index].to_vec(),instructions:Vec::new()});
             end_brace_index+=1;
         }
         //let keys:Vec<&String> = self.corutines.keys().collect();
@@ -155,6 +155,20 @@ impl AsyncCorutineDescriptor {
                     return Err(format!("too many things on the left of the <-, found at index: {}",equals));
                 }
                 stantement = Some(Stantement::PUT(get_ident_name(instruction[0])?, Expression::new(instruction[2..].to_vec())));
+            } else if instruction.contains(&&token::Token::GET) {
+                if instruction.len() != 3 {
+                    return Err(format!("Wrong number of operands in pipe listen"));
+                }
+                stantement = Some(Stantement::GET(get_ident_name(instruction[0])?,get_ident_name(instruction[2])?));
+            } else if instruction.len() == 1 {
+                // single value;
+                match instruction[0] {
+                    token::Token::IDENT(v) => {
+                        let v_name = get_ident_name(instruction[0])?;
+                        panic!("should not get here");
+                    },
+                    v => return Err(format!("Invalid literal  {:?}", v))
+                }
             }
             if let Some(exp) = stantement {
                 final_expression.push(exp);

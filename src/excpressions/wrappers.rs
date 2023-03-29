@@ -45,7 +45,7 @@ impl Swarm {
 #[derive(Debug)]
 pub struct AsyncCorutine {
     pub corutine:AsyncCorutineDescriptor,
-    pub variables: HashMap<String,()>,
+    pub variables: HashMap<String,Variable>,
     pub i_counter:usize
 }
 
@@ -80,6 +80,18 @@ impl Pipe {
                     },
                 };}
             None => Err("Impossible to send data in this pipe")
+        }
+    }
+    pub fn receive (&self) -> Result<Message, String> {
+        match &self.receiver {
+            Some(r) => {
+                let message = r.recv();
+                match message {
+                    Ok(m) => Ok(m),
+                    Err(e) => Err(format!("Error in channel rcv: {}",e.to_string())),
+                }
+            },
+            None =>  Err("Impossible to recive data from this pipe".to_owned())
         }
     }
 }
