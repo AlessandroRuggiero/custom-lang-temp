@@ -52,7 +52,7 @@ impl Swarm {
             let cr = self.swarm.corutines.get(corutine).expect("invalid key got from map").clone();
             let mut cr = AsyncCorutine::new(cr);
             let pipes = self.pipes.clone();
-            println!("started: {}",cr.corutine.name);
+            //println!("started: {}",cr.corutine.name);
             handles.push(thread::spawn(move || {
                 cr.execute(pipes);
             }));
@@ -71,7 +71,7 @@ impl Swarm {
 
 impl AsyncCorutine {
     pub fn execute (&mut self, pipes:HashMap<String,Pipe>) {
-        println!("Executing: {:?}",self.corutine.instructions.clone());
+        //println!("Executing: {:?}",self.corutine.instructions.clone());
         while self.i_counter != self.corutine.instructions.len(){
             let instruction = &self.corutine.instructions[self.i_counter];
             match instruction {

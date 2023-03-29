@@ -14,7 +14,7 @@ fn main() {
         Ok(mut swarm)=> {
             swarm.parse_functions().unwrap();
             //println!("Program processed correctly {:?}",swarm.corutines.get("main").unwrap());
-            println!("{:?}",swarm);
+            //println!("{:?}",swarm);
             let mut swarm = Swarm::new(swarm);
             swarm.execute_corutines();
         },
