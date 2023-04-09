@@ -1,4 +1,4 @@
-use std::{thread::{self, JoinHandle}, collections::HashMap, io};
+use std::{thread::{self, JoinHandle},io, collections::HashMap};
 use crossbeam_channel::bounded;
 
 use super::{wrappers::{Swarm, AsyncCorutine, Pipe, Message}, expressions::{Stantement, Variable}};

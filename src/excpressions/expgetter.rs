@@ -142,7 +142,10 @@ impl AsyncCorutineDescriptor {
         //println!("{:?}",instructions);
         for instruction in instructions{
             let mut stantement = None;
-            if instruction.contains(&&token::Token::ASSIGN) {
+            if instruction[0] == &token::Token::IF {
+                
+            }
+            else if instruction.contains(&&token::Token::ASSIGN) {
                 let equals = find(&instruction, &&token::Token::ASSIGN, "Impossible to find = in assign expression")?;
                 if equals != 1 {
                     return Err(format!("too many things on the left of the =, found at index: {}",equals));
